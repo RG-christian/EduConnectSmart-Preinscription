@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: educonnect-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run dev
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: educonnect-db
+          property: connectionString
+
+  - type: web
+    name: educonnect-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+
+databases:
+  - name: educonnect-db
+    databaseName: educonnect
+    user: admin
+    plan: free

@@ -1,0 +1,1175 @@
+model Administrateur {
+  id           String   @id
+  nom          String
+  email        String   @unique(map: "Administrateur_email_key")
+  motDePasse   String
+  role         String
+  actif        Boolean
+  dernierAcces DateTime
+}
+
+model Etudiant {
+  id                String    @id @default(uuid())
+  nom               String
+  prenom            String
+  dateNaissance     DateTime
+  lieuNaissance     String
+  email             String    @unique
+  telephone         String
+  motDePasse        String
+  statutEtudiant    String
+  statutFinancement String
+  boursier          Boolean
+  serieBac          String
+  domaine           String
+  filiere           String
+  anneeInscription  Int
+  parcours          String
+  uniforme          Boolean
+  fraisAnnexesPayes Boolean
+  statutDossier     String
+  derniereMiseAJour DateTime?
+
+  // Relations
+  inscription    Inscription?
+  reinscriptions Reinscription[] @relation("EtudiantReinscriptions")
+  pdfs           PDF[]           @relation("EtudiantPDFs")
+}
+
+model Inscription {
+  id                  String   @id @default(uuid())
+  etudiantId          String   @unique
+  anneeScolaire       Int
+  filiere             String
+  parcours            String
+  statutFinancement   String
+  fraisInscription    Float
+  fraisAnnexes        Float
+  uniformeChoisi      Boolean
+  fraisUniforme       Float
+  totalAPayer         Float
+  paiementEffectue    Boolean
+  dateSoumission      DateTime
+  statut              String
+  ficheInscriptionPDF String?
+  documentsComplets   Boolean  @default(false)
+  verifieParAdmin     Boolean  @default(false)
+
+  etudiant  Etudiant   @relation(fields: [etudiantId], references: [id])
+  documents Document[]
+}
+
+model Reinscription {
+  id                    String   @id @default(uuid())
+  etudiantId            String
+  anneeScolaire         Int
+  parcours              String
+  statutFinancement     String
+  uniformeChoisi        Boolean
+  fraisAnnexes          Float
+  fraisUniforme         Float
+  totalAPayer           Float
+  paiementEffectue      Boolean
+  dateSoumission        DateTime
+  statut                String
+  ficheReinscriptionPDF String?
+  verifieParAdmin       Boolean  @default(false)
+
+  // Relation avec Etudiant
+  etudiant  Etudiant   @relation("EtudiantReinscriptions", fields: [etudiantId], references: [id])
+  documents Document[]
+}
+
+model Document {
+  id              String   @id @default(uuid())
+  inscriptionId   String?
+  reinscriptionId String?
+  type            String
+  url             String
+  dateDepot       DateTime @default(now())
+
+  inscription   Inscription?   @relation(fields: [inscriptionId], references: [id])
+  reinscription Reinscription? @relation(fields: [reinscriptionId], references: [id])
+
+  @@index([inscriptionId])
+  @@index([reinscriptionId])
+}
+
+model PDF {
+  id             String   @id @default(uuid())
+  etudiantId     String
+  type           String
+  url            String
+  anneeScolaire  Int
+  dateGeneration DateTime
+
+  etudiant Etudiant @relation("EtudiantPDFs", fields: [etudiantId], references: [id])
+
+  @@index([etudiantId])
+}
+
+// Généré automatiquement depuis le fichier SQL
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Acces {
+  idac        Int      @id
+  idc         Int
+  pc          String
+  ip          String
+  os          String?
+  pagevisitee String
+  dateac      DateTime
+}
+
+model Anfacdepts {
+  idanfacdept Int  @id
+  idanfac     Int
+  iddep       Int
+  idens       Int?
+}
+
+model Anfacdptniv {
+  idanfdn     Int    @id
+  idanfacdept Int
+  idnv        Int
+  semestres   String
+  scolariteo  Int?
+  scolariteno Int?
+  scolaritei  Int?
+  inscription Int?
+  scolaritet  Int?
+}
+
+model Anfacdptnvparcs {
+  idafdnp Int @id
+  idanfdn Int
+  idparc  Int
+}
+
+model Anfacdptnvprcmats {
+  idafdnpm Int   @id
+  idafdnp  Int
+  idm      Int
+  heure    Int
+  credit   Float
+  semestre Int
+  requis   Int?
+  idens    Int?
+}
+
+model Anneesunivs {
+  idanuniv Int      @id
+  anuniv   String
+  cloture  Int?
+  archive  Int?
+  sup      Int?
+  dateaj   DateTime
+}
+
+model Anonymats {
+  idano       Int       @id
+  idanuniv    Int
+  idins       Int
+  idcm        Int
+  unique_code String
+  session     Int?
+  dateaj      DateTime?
+}
+
+model Ansites {
+  idas     Int @id
+  idanuniv Int
+  idsit    Int
+}
+
+model Anunivfacs {
+  idanfac  Int @id
+  idanuniv Int
+  idf      Int
+}
+
+model Approdetails {
+  idapprod Int       @id
+  idappro  Int
+  idar     Int
+  quantite Int
+  dateaj   DateTime?
+}
+
+model Approvisionnements {
+  idappro   Int       @id
+  numappro  String
+  intitule  String?
+  fichier   String?
+  dateappro DateTime
+  dateaj    DateTime?
+}
+
+model Articles {
+  idar            Int       @id
+  libelle         String
+  caracteristique String?
+  minima          Int?
+  arch            Int?
+  dateaj          DateTime?
+}
+
+model Asbats {
+  idasb Int     @id
+  idas  Int
+  idbat Int
+  genre String?
+}
+
+model Asbpals {
+  idasbp Int @id
+  idasb  Int
+  idpal  Int
+}
+
+model Asbpchs {
+  idasbpc        Int  @id
+  idasbp         Int
+  idchb          Int
+  requisitionnee Int?
+}
+
+model Avoirs {
+  idav        Int       @id
+  idfact      Int
+  periode     String
+  designation String
+  montant     Int
+  abattement  Int
+  payes       Int
+  reste       Int
+  dateaj      DateTime?
+}
+
+model Banques {
+  idb     Int      @id
+  libb    String
+  archive Int?
+  sup     Int?
+  dateaj  DateTime
+}
+
+model Batiments {
+  idbat    Int       @id
+  batiment String
+  arch     Int?
+  sup      Int?
+  dateaj   DateTime?
+}
+
+model Categories {
+  idcat     Int      @id
+  categorie String
+  codec     String
+  archive   Int?
+  dateaj    DateTime
+}
+
+model Chambres {
+  idchb   Int       @id
+  chambre String
+  arch    Int?
+  sup     Int?
+  dateaj  DateTime?
+}
+
+model Cheques {
+  idch       Int       @id
+  idb        Int
+  idpaie     Int
+  numero     String
+  ncd        String?
+  etatcheque String?
+  datech     DateTime
+  daterejet  DateTime?
+  motif      String?
+  supprime   Int?
+}
+
+model Communications {
+  idcom         Int       @id
+  idanuniv      Int
+  cible         String
+  destinataires String?
+  objet         String
+  message       String
+  dateaj        DateTime?
+}
+
+model Comptes {
+  idc      Int       @id
+  photo    String?
+  idpro    Int
+  dpt      String?
+  nom      String
+  prenoms  String
+  email    String
+  login    String
+  motpass  String
+  active   Int?
+  dateconn DateTime?
+  sup      Int?
+  dateaj   DateTime?
+}
+
+model Comptesetudiants {
+  idce      Int       @id
+  ide       Int
+  matricule String
+  motpass   String
+  dateconn  DateTime?
+  active    Int?
+  arch      Int?
+  dateaj    DateTime?
+}
+
+model Comptesparents {
+  idcp        Int       @id
+  identitep   String
+  professionp String?
+  contactp    String?
+  emailp      String?
+  identitem   String
+  professionm String?
+  contactm    String?
+  emailm      String?
+  login       String
+  motpass     String
+  dateconn    DateTime?
+  active      Int?
+  arch        Int?
+  dateaj      DateTime?
+}
+
+model Configmoy {
+  idcm     Int       @id
+  idafdnpm Int
+  idev     Int
+  poids    Float?
+  typoids  String?
+  dateaj   DateTime?
+}
+
+model Consultations {
+  idcons      Int       @id
+  idanuniv    Int
+  idc         Int
+  idpat       Int
+  numcons     String
+  poids       Float
+  temperature Float
+  tension     String
+  frecardiac  Int
+  declaration String?
+  diagnostic  String?
+  decision    String?
+  datecons    DateTime?
+  dateaj      DateTime?
+}
+
+model Contrats {
+  idcont  Int       @id
+  contrat String
+  codect  String?
+  arch    Int?
+  dateaj  DateTime?
+}
+
+model Deliberations {
+  idelib      Int       @id
+  idafdnpm    Int
+  idins       Int
+  idafdnp     Int
+  semestre    Int
+  moyenne     Float
+  session1    Float
+  creditseus  Float?
+  observation String?
+  datedelib   DateTime
+  moyenne2    Float?
+  session2    Float?
+  obsess2     String?
+  creditseus2 Float?
+  datesess2   DateTime?
+  creditsdus  Float?
+  dateaj      DateTime
+}
+
+model Delibue {
+  idelue      Int       @id
+  idins       Int
+  idafdnp     Int?
+  idue        Int
+  semestre    Int
+  moyenne     Float
+  session1    Float
+  creditseus  Float?
+  observation String?
+  datedelib   DateTime
+  moyenne2    Float?
+  session2    Float?
+  creditseus2 Float?
+  obsess2     String?
+  datesess2   DateTime?
+  creditsdus  Float?
+  dateaj      DateTime
+}
+
+model Departements {
+  iddep       Int       @id
+  departement String
+  code        String
+  archive     Int?
+  sup         Int?
+  dateaj      DateTime?
+}
+
+model Dettacads {
+  iddac    Int       @id
+  ide      Int
+  idafdnpm Int
+  moyenne  Float
+  etat     String?
+  dateaj   DateTime?
+}
+
+model Directions {
+  iddir     Int      @id
+  direction String
+  codedir   String
+  arch      Int?
+  dateaj    DateTime
+}
+
+model Documents {
+  iddoc   Int      @id
+  idform  Int
+  doc     String
+  fichier String
+  dateaj  DateTime
+}
+
+model Ecuminmoys {
+  idemm    Int       @id
+  idafdnpm Int
+  minmoy   Float
+  etat     Int?
+  dateaj   DateTime?
+}
+
+model Edocuments {
+  idedoc  Int      @id
+  idemp   Int
+  doc     String
+  fichier String
+  dateaj  DateTime
+}
+
+model Edtbats {
+  idedtbat Int       @id
+  batiment String
+  arch     Int?
+  dateaj   DateTime?
+}
+
+model Emplois {
+  idemploi    Int       @id
+  idemp       Int
+  idserv      Int
+  idfonct     Int
+  idcont      Int
+  idcat       Int?
+  datembauche DateTime
+  classe      Int?
+  echelon     Int?
+  typers      String
+  typens      String?
+  grade       String?
+  specialite  String?
+  datedepart  DateTime?
+  motif       String?
+  declaration Int?
+  cessation   Int?
+  arch        Int?
+  dateaj      DateTime
+}
+
+model Employes {
+  idemp       Int       @id
+  matricule   String?
+  photo       String?
+  numcnss     String?
+  xpro        Int?
+  nom         String?
+  prenoms     String?
+  sexe        String?
+  datenaiss   DateTime?
+  lieunaiss   String?
+  religion    String
+  handicap    String?
+  matrimo     String?
+  epoux       String?
+  adresse     String?
+  tel         String?
+  cel         String?
+  email       String?
+  pays        String
+  nationalite String?
+  numpid      String?
+  naturepid   String?
+  datetabpid  DateTime?
+  autoritepid String?
+  etatcivil   String?
+  quartier    String?
+  rue         String
+  niveau      String?
+  diplome     String?
+  arch        Int?
+  dateaj      DateTime
+}
+
+model Enfants {
+  idenf     Int       @id
+  idemp     Int
+  nom       String
+  prenoms   String
+  sexe      String
+  datenaiss DateTime
+  dateaj    DateTime?
+}
+
+model Enseignants {
+  idens      Int      @id
+  nom        String
+  prenoms    String
+  sexe       String
+  adresse    String?
+  tel        String?
+  cel        String
+  email      String?
+  categorie  String
+  diplome    String
+  specialite String?
+  grade      String?
+  etbservice String?
+  provenance String?
+  employeur  String
+  archive    Int?
+  sup        Int?
+  dateaj     DateTime
+}
+
+model Entreprises {
+  ident     Int       @id
+  idtype    Int
+  idsecteur Int
+  rs        String
+  tel       String
+  email     String
+  arch      Int?
+  dateaj    DateTime?
+}
+
+model Etudiants {
+  ide         Int      @id
+  matricule   String
+  nom         String
+  prenoms     String
+  sexe        String
+  datenaiss   DateTime
+  lieunaiss   String
+  identitep   String
+  professionp String?
+  contactp    String
+  emailp      String?
+  emailm      String?
+  identitem   String
+  professionm String?
+  contactm    String?
+  profilbac   String
+  sessionbac  String
+  villebac    String?
+  pvbac       String
+  mention     String
+  paysbac     String
+  etaborigin  String
+  adressetab  String?
+  archive     Int?
+  sup         Int?
+  dateaj      DateTime
+}
+
+model Evaluations {
+  idev     Int       @id
+  intitule String
+  arch     Int?
+  sup      Int?
+  dateaj   DateTime?
+}
+
+model Examens {
+  idex        Int       @id
+  idc         Int
+  idcons      Int
+  nature      String
+  designation String
+  resultats   String?
+  decision    String?
+  datex       DateTime?
+}
+
+model Factures {
+  idfact   Int      @id
+  ids      Int
+  numfact  String
+  datefact DateTime
+  sup      Int?
+  dateaj   DateTime
+}
+
+model Facultes {
+  idf     Int       @id
+  fac     String
+  code    String
+  archive Int?
+  sup     Int?
+  dateaj  DateTime?
+}
+
+model Fonctions {
+  idfonct  Int       @id
+  fonction String
+  arch     Int?
+  dateaj   DateTime?
+}
+
+model Formations {
+  idform        Int     @id
+  idins         Int
+  annee         String
+  niveau        String
+  diplome       String
+  moyenne       String
+  pays          String
+  etablissement String
+  mention       String?
+  sup           Int?
+}
+
+model Hebergements {
+  idh         Int       @id
+  idanuniv    Int
+  ide         Int
+  numero      String
+  duree       String
+  modepay     String
+  motivation  String
+  autremotive String?
+  etat        Int?
+  avis        String?
+  observation String?
+  dateavis    DateTime?
+  idasbpc     String?
+  datechb     DateTime?
+  dateaj      DateTime?
+}
+
+model Horaires {
+  idh     Int      @id
+  horaire String
+  archive Int?
+  sup     Int?
+  dateaj  DateTime
+}
+
+model Inscriptions {
+  idins               Int      @id
+  idanuniv            Int
+  ide                 Int
+  oriente             Int?
+  noriente            String?
+  photo               String?
+  pieceid             String
+  npieceid            String
+  matrimo             String
+  nomjeunefille       String?
+  religion            String?
+  diocese             String?
+  diocontacts         String?
+  ville               String
+  commune             String
+  quartier            String
+  bp                  String?
+  contact             String
+  email               String?
+  region              String?
+  pays                String
+  nationalite         String
+  boursier            String
+  nombourse           String?
+  organisme           String?
+  numbourse           String?
+  profession          String?
+  societe             String?
+  ctidentite          String?
+  ctprofession        String?
+  ctadresse           String?
+  ctcel               String?
+  ctemail             String?
+  ctquartier          String
+  nummaison           String?
+  idafdnp             Int
+  acquis              Int?
+  typeins             String?
+  reinscrit           Int?
+  dette               Int?
+  dettecu             String?
+  idpreins            Int?
+  idreins             Int?
+  idreinsdet          Int?
+  dateaj              DateTime
+  sup                 Int?
+  diplomeapbac        String
+  mentiondiplomeapbac String
+  site                String
+  cntsociete          String
+  canal               String
+}
+
+model Matieres {
+  idm      Int       @id
+  idue     Int?
+  matiere  String
+  code     String?
+  archive  Int?
+  datearch DateTime?
+  sup      Int?
+  datesup  DateTime?
+  dateaj   DateTime
+}
+
+model Messages {
+  idmsg   Int       @id
+  message String
+  dateaj  DateTime?
+}
+
+model Modperms {
+  idmp   Int    @id
+  idmo   Int
+  idperm Int
+  codeMP String
+}
+
+model Modules {
+  idmo   Int    @id
+  module String
+  code   String
+}
+
+model Niveaux {
+  idnv    Int      @id
+  niveau  String
+  archive Int?
+  sup     Int?
+  dateaj  DateTime
+}
+
+model Notes {
+  idn         Int      @id
+  idins       Int
+  note        Float?
+  observation String?
+  idcm        Int
+  semestre    Int
+  idafdnpm    Int
+  daten       DateTime
+  dateaj      DateTime
+}
+
+model Operations {
+  ido       Int      @id
+  operation String
+  archive   Int?
+  sup       Int?
+  dateaj    DateTime
+}
+
+model Paiements {
+  idpaie    Int       @id
+  numrecu   Int
+  ids       Int
+  ido       Int
+  montant   Int
+  mois      Int?
+  nature    String
+  datepaie  DateTime?
+  datetrans DateTime?
+  piece     String?
+  sup       Int?
+  dateaj    DateTime
+}
+
+model Paiepreins {
+  idppaie  Int       @id
+  idpreins Int
+  numrecu  Int
+  montant  Int
+  datepaie DateTime?
+  piece    String?
+  sup      Int?
+  dateaj   DateTime?
+}
+
+model Paliers {
+  idpal  Int       @id
+  palier String
+  arch   Int?
+  sup    Int?
+  dateaj DateTime?
+}
+
+model Parcours {
+  idparc  Int     @id
+  idpar   Int?
+  code    String?
+  libelle String
+  archive Int?
+  sup     Int?
+}
+
+model Patients {
+  idpat     Int       @id
+  ide       Int
+  ethnie    String?
+  gsanguin  String?
+  maladies  String?
+  allergies String?
+  handicap  String?
+  etat      Int?
+  datedos   DateTime?
+  statut    Int?
+  sup       Int?
+  dateaj    DateTime?
+}
+
+model Pdocuments {
+  idpdoc    Int       @id
+  idpreins  Int?
+  idpform   Int
+  categorie String?
+  doc       String
+  fichier   String
+  dateaj    DateTime?
+}
+
+model Permissions {
+  idperm     Int    @id
+  permission String
+  code       String
+}
+
+model Pformations {
+  idpform       Int     @id
+  idpreins      Int
+  annee         String
+  niveau        String
+  diplome       String
+  moyenne       String?
+  pays          String
+  etablissement String
+  mention       String?
+  sup           Int?
+}
+
+model Phototheque {
+  idp       Int      @id
+  album     String
+  miniature String
+  dossier   String
+  publier   Int?
+  dateaj    DateTime
+}
+
+model Plannings {
+  idpl     Int       @id
+  idafdnpm Int
+  idsal    Int
+  jour     String
+  dheure   String
+  fheure   String
+  dateaj   DateTime?
+}
+
+model Preinscriptions {
+  idpreins            BigInt   @id @default(autoincrement())
+  idanuniv            Int
+  oriente             Int
+  noriente            String?
+  numero              String
+  photo               String?
+  nom                 String
+  prenoms             String
+  nomjeunefille       String?
+  sexe                String
+  matrimo             String?
+  datenaiss           DateTime
+  lieunaiss           String
+  nationalite         String
+  telperso            String
+  telephone_parent    String?
+  domicile            String
+  email               String?
+  boursier            String? // si tu le veux vraiment requis, enlève le ?
+  nombourse           String?
+  organisme           String?
+  numbourse           String?
+  bac                 String
+  anneebac            String
+  totalpoints         Float?
+  moybac              Float?
+  mention             String?
+  etaborigin          String?
+  pays_bac            String?
+  institut            String?
+  mention_orientation String?
+  niveau              String?
+  specialite          String?
+  annee_academique    String?
+  idafdnp             BigInt
+  acquis              Int?
+  dateaj              DateTime @default(now())
+  inscrit             Int?
+  status              String?
+  observation         String?  @db.Text
+  archive             Int?
+  sup                 Int?
+  online              Int?
+  confirm             Int?
+
+  @@unique([nom, prenoms, datenaiss], name: "uniq_nom_prenoms_datenaiss")
+}
+
+model Prescriptions {
+  idpres     Int       @id
+  idc        Int
+  idcons     Int
+  medicament String
+  psologie   String
+  quantite   String
+  dateaj     DateTime?
+}
+
+model Profils {
+  idpro   Int    @id
+  profil  String
+  modules String
+  droits  String
+}
+
+model Remplacenotes {
+  idrn        Int      @id
+  idins       Int
+  idafdnpm    Int
+  note        Float?
+  observation String?
+  semestre    Int
+  datern      DateTime
+  dateaj      DateTime
+}
+
+model Resultats {
+  idr        Int   @id
+  idafdnp    Int
+  idins      Int
+  semestre   Int
+  session    Int
+  moyenne    Float
+  creditseus Float
+  creditsdus Float
+}
+
+model Salles {
+  idsal    Int       @id
+  idedtbat Int
+  salle    String
+  capacite Int?
+  arch     Int?
+  dateaj   DateTime?
+}
+
+model Scolarites {
+  ids        Int      @id
+  idins      Int
+  idanfdn    Int
+  abattement Int?
+  piece      String?
+  dateaj     DateTime
+}
+
+model Secteurs {
+  idsecteur Int       @id
+  secteur   String
+  arch      Int?
+  dateaj    DateTime?
+}
+
+model Seminmoys {
+  idsemm   Int       @id
+  idafdnp  Int
+  minmoy   Float?
+  tcredits Float?
+  etat     Int?
+  dateaj   DateTime?
+}
+
+model Services {
+  idserv   Int       @id
+  iddir    Int
+  service  String
+  codeserv String?
+  arch     Int?
+  dateaj   DateTime?
+}
+
+model Sites {
+  idsit  Int       @id
+  site   String
+  arch   Int?
+  sup    Int?
+  dateaj DateTime?
+}
+
+model Sms {
+  idsms        Int       @id
+  idmsg        Int
+  destinataire Int
+  cel          String
+  categorie    String
+  dateaj       DateTime?
+}
+
+model Sortiesarticles {
+  idsar    Int       @id
+  idserv   Int
+  idemp    Int
+  numsort  String
+  intitule String?
+  fichier  String?
+  datesort DateTime
+  dateaj   DateTime?
+}
+
+model Sortiesdetails {
+  idsard   Int       @id
+  idsar    Int
+  idar     Int
+  quantite Int
+  dateaj   DateTime?
+}
+
+model Stages {
+  idstage Int       @id
+  ident   Int
+  idins   Int
+  ddate   DateTime
+  fdate   DateTime
+  dateaj  DateTime?
+}
+
+model Stocks {
+  idsto    Int @id
+  idar     Int
+  quantite Int
+}
+
+model Suivicours {
+  idsc     Int      @id
+  idafdnpm Int
+  heure    Int
+  comment  String?
+  dates    DateTime
+  dateaj   DateTime
+}
+
+model Typentreprises {
+  idtype Int       @id
+  type   String
+  arch   Int?
+  dateaj DateTime?
+}
+
+model Valdeliberations {
+  idvelib     Int      @id
+  idafdnp     Int
+  idafdnpm    Int
+  idpreins    Int
+  semestre    Int
+  moyenne     Float
+  session1    Float
+  creditseus  Float
+  creditsdus  Float
+  observation String?
+  datedelib   DateTime
+  dateaj      DateTime
+}
+
+model Valdelibue {
+  idvelue     Int      @id
+  idpreins    Int
+  idafdnp     Int?
+  idue        Int
+  semestre    Int
+  moyenne     Float
+  session1    Float
+  creditseus  Float?
+  creditsdus  Float?
+  observation String?
+  datedelib   DateTime
+  dateaj      DateTime
+}
+
+model Valresultats {
+  idvr       Int   @id
+  idafdnp    Int
+  idpreins   Int
+  semestre   Int
+  session    Int
+  moyenne    Float
+  creditseus Float
+  creditsdus Float
+}
+
+model Varchetudiants {
+  idc      Int       @id
+  idcons   Int
+  decision String?
+  datevis  DateTime
+  dateaj   DateTime?
+}
+
+model Visiteurs {
+  idvist   Int       @id
+  idh      Int
+  pieceid  String
+  npieceid String
+  lienp    String
+  nom      String
+  prenoms  String
+  harrive  String
+  hdepart  String?
+  datevis  DateTime
+  dateaj   DateTime?
+}

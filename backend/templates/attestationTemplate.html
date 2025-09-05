@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Attestation de Préinscription</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-12 font-sans text-gray-900 text-[15px] leading-relaxed">
+<div class="text-center mb-6">
+    <div class="font-bold text-sm">RÉPUBLIQUE GABONAISE</div>
+    <div class="text-sm">Union – Travail – Justice</div>
+    <div class="font-bold mt-2 text-[15px]">École Supérieure de Gestion et d’Informatique</div>
+    <div class="font-bold text-[15px]">E.S.G.I.S.</div>
+</div>
+
+<h2 class="text-center text-lg font-bold underline mb-6">ATTESTATION DE PRÉINSCRIPTION</h2>
+
+<p class="mb-4">Nous soussignons, Direction Académique de l'École Supérieure de Gestion et d’Informatique, attestons que :</p>
+
+<div class="space-y-2 mb-6">
+    <p><span class="font-semibold">Nom :</span> {{nom}}</p>
+    <p><span class="font-semibold">Prénom :</span> {{prenom}}</p>
+    <p><span class="font-semibold">Date de naissance :</span> {{dateNaissance}}</p>
+    <p><span class="font-semibold">Lieu de naissance :</span> {{lieuNaissance}}</p>
+</div>
+
+<p class="mb-2">Est préinscrit en :</p>
+
+<div class="space-y-2 mb-6">
+    <p><span class="font-semibold">Niveau :</span> {{niveau}} &nbsp;&nbsp;&nbsp;
+        <span class="font-semibold">Domaine :</span> {{domaine}} &nbsp;&nbsp;&nbsp;
+        <span class="font-semibold">Spécialité :</span> {{specialite}}</p>
+    <p><span class="font-semibold">Série Bac :</span> {{serieBac}}</p>
+    <p>Pour l’année académique {{annee}} - {{anneePlusUn}}.</p>
+</div>
+
+<div class="mt-12">
+    <p>Fait à Libreville, le {{dateActuelle}}</p>
+    <p class="text-right mt-8 pr-10 font-semibold">Direction académique</p>
+</div>
+</body>
+</html>
